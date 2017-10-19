@@ -35,14 +35,13 @@ def task_b(TIMESTEP=60):
         x = [0 for k in range(7*24*TIMESTEP)]
         for i in range(1,7*24*TIMESTEP):
             birth = np.random.rand() <= 25/TIMESTEP
+            death = np.random.rand() <= x[i-1]/TIMESTEP
             if (x[i-1] < 32):    
                 pass
-            else:
+            elif (birth and not death):
                 forw += 1
                 birth = 0
                 
-            death = np.random.rand() <= x[i-1]/TIMESTEP
-            
             x[i] = x[i-1] + birth - death
         
         
@@ -99,5 +98,5 @@ def task_b_cont():
 
 if __name__ == "__main__":
     plt.style.use("ggplot")
-    task_a()
+    #task_a()
     task_b_cont()

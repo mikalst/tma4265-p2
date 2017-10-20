@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from numba import jit
 
+@jit
 
 
 def task_a():
@@ -23,19 +25,19 @@ def task_a():
     plt.bar(range(33), pi)
     plt.savefig("p2_task_a.pdf")
     
-def task_b(TIMESTEP=60):
+def task_b(Points_Per_Hour=60):
     ITER = 100
-    avg = [0 for k in range(7*24*TIMESTEP)]
+    avg = [0 for k in range(7*24*Points_Per_Hour)]
     forw = 0
     long_term = [0 for k in range(33)]
     
     plt.figure()
     
     for _ in range(ITER):
-        x = [0 for k in range(7*24*TIMESTEP)]
-        for i in range(1,7*24*TIMESTEP):
-            birth = np.random.rand() <= 25/TIMESTEP
-            death = np.random.rand() <= x[i-1]/TIMESTEP
+        x = [0 for k in range(7*24*Points_Per_Hour)]
+        for i in range(1,7*24*Points_Per_Hour):
+            birth = np.random.rand() <= 25/Points_Per_Hour
+            death = np.random.rand() <= x[i-1]/Points_Per_Hour
             if (x[i-1] < 32):    
                 pass
             elif (birth and not death):
@@ -45,19 +47,19 @@ def task_b(TIMESTEP=60):
             x[i] = x[i-1] + birth - death
         
         
-        for d in x[24*60::TIMESTEP]:
+        for d in x[24*60::Points_Per_Hour]:
             long_term[d]+=1
         
-        plt.plot(range(len(x)//TIMESTEP), x[::TIMESTEP], lw=0.5)
+        #plt.plot(range(len(x)//TIMESTEP), x[::TIMESTEP], lw=0.5)
         
         avg = [avg[i]+ el for i, el in enumerate(x)]
     
     L = sum(long_term)
     long_term = [el/L for el in long_term]
     
-    print("Average forwarded pr. hour = {}".format(forw * 60 / (TIMESTEP * ITER * 7*24)))
+    print("Average forwarded pr. hour = {}".format(forw / (ITER * (7*24))))
     
-    avg = [d/ITER for d in avg[::TIMESTEP]]
+    avg = [d/ITER for d in avg[::Points_Per_Hour]]
     
     plt.xlabel("$t$   [hours]")
     plt.ylabel("$N(t)$")
@@ -67,17 +69,18 @@ def task_b(TIMESTEP=60):
     average, = plt.plot(range(len(avg)), avg, lw=2.0, color="black", label=r"Average $ \bar{N}(t)$")
     
     plt.legend(handles=[average])
-    plt.savefig("p2_task_b_simul_ts_"+str(TIMESTEP)+".pdf")
+    plt.savefig("p2_task_b_simul_ts_"+str(Points_Per_Hour)+".pdf")
     
     return long_term
     
 def task_b_cont():
     
     
-    for f in [1, 4, 16]:
+    for f in [1, 4, 16, 64]:
         color = {1:"blue",
                  4:"red",
-                 16:"yellow"}[f]
+                 16:"yellow",
+                 64:"green"}[f]
         lt = task_b(f*60)
         plt.figure(9)
         plt.bar(range(33), lt, color=color)
@@ -86,9 +89,10 @@ def task_b_cont():
     plt.xlabel("$n$")
     plt.ylabel(r"$r(n)$")
     
-    plt.legend([r"Timestep = $1h$",
-                r"Timestep = $\frac{1}{4}h$",
-                r"Timestep = $\frac{1}{16}h$"])
+    plt.legend([r"Timestep = $1m$",
+                r"Timestep = $\frac{1}{4}m$",
+                r"Timestep = $\frac{1}{16}m$",
+                r"Timestep = $\frac{1}{64}m$"])
     
     plt.savefig("p2_task_b_r.pdf")
     

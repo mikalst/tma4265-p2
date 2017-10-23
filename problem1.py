@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from heapq import heappush, heappop
 from math import factorial
 
 def simulate_poisson(intensity, days):
@@ -86,7 +87,12 @@ def average_over_simulate(days, ITERATIONS, limit, intensity=None):
     average/=ITERATIONS
     exceeded/=ITERATIONS
     
-    return average, realizations, np.mean(costs), np.var(costs), np.mean(discounts), np.var(discounts), exceeded
+    discounts.sort()
+    top_95 = discounts[int(ITERATIONS*0.95)]
+    
+    
+    
+    return average, realizations, np.mean(costs), np.var(costs), np.mean(discounts), np.var(discounts), top_95, exceeded
     
 def task_a():
     
@@ -94,7 +100,7 @@ def task_a():
     prob = 1-sum([poisson(3, 59, k) for k in range(0, 176)])
     print("Probability of recieving more than 175 claims = {}".format(prob))
     
-    r1, realizations, cost, S_cost, discount, S_discount, exceeded = average_over_simulate(59, 100, 175, 3)
+    r1, realizations, cost, S_cost, discount, S_discount, t95, exceeded = average_over_simulate(59, 100, 175, 3)
     
     print("Simulated ratio with more than 175 claims recieved = {}".format(exceeded))
     
@@ -121,7 +127,7 @@ def task_b():
     prob = 1-sum([smart_factorial(167.367, k) for k in range(0, 176)])
     print("Probability of recieving more than 175 claims = {}".format(prob))
     
-    r1, realizations, cost, S_cost, discount, S_discount, exceeded = average_over_simulate(59, 100, 175,
+    r1, realizations, cost, S_cost, discount, S_discount, t95, exceeded = average_over_simulate(59, 100, 175,
                                                                       lambda t: 2+np.cos(t*np.pi/182.5))
     
     print("Simulated ratio with more than 175 claims recieved = {}".format(exceeded))
@@ -141,20 +147,24 @@ def task_b():
     plt.show()
 
 def task_c():
-    r1, realizations, cost, S_cost, discount, S_discount, exceeded = average_over_simulate(59, 1000, 175, 3)
+    r1, realizations, cost, S_cost, discount, S_discount, t95, exceeded = average_over_simulate(59, 1000, 175, 3)
     print("fixed lambda, mean(Z)={}, S_Z = {}".format(
             cost, S_cost))
-    r1, realizations, cost, S_cost, discount, S_discount, exceeded = average_over_simulate(59, 1000, 175, lambda t: 2+np.cos(t*np.pi/182.5))
+    r1, realizations, cost, S_cost, discount, S_discount, t95, exceeded = average_over_simulate(59, 1000, 175, lambda t: 2+np.cos(t*np.pi/182.5))
     print("varying lambda, mean(Z)={}, S_Z = {}".format(
             cost, S_cost))
 
 def task_d():
-    r1, realizations, cost, S_cost, discount, S_discount, exceeded = average_over_simulate(365, 100, 175, 3)
+    r1, realizations, cost, S_cost, discount, S_discount, t95, exceeded = average_over_simulate(365, 1000, 175, 3)
     print("fixed lambda, mean(Z)={}, S_Z = {}".format(
             discount, S_discount))
-    r1, realizations, cost, S_cost, discount, S_discount, exceeded = average_over_simulate(365, 100, 175, lambda t: 2+np.cos(t*np.pi/182.5))
+    print("value indicating 95th percentile = {}".format(t95))
+    
+    r1, realizations, cost, S_cost, discount, S_discount, t95, exceeded = average_over_simulate(365, 1000, 175, lambda t: 2+np.cos(t*np.pi/182.5))
     print("varying lambda, mean(Z)={}, S_Z = {}".format(
             discount, S_discount))
+    print("value indicating 95th percentile = {}".format(t95))
+    
 
 if __name__ == "__main__":
     #task_a()

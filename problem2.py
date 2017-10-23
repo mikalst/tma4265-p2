@@ -2,8 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numba import jit
 
-@jit
-
 
 def task_a():
     l = [25 for i in range(33)]
@@ -18,6 +16,8 @@ def task_a():
     L = sum(pi)
     pi = [el/L for el in pi]
     print(pi)
+    
+    print(pi[-1])
     
     plt.title("$\pi_n, \quad n = 0, 1 ..., 32$")
     plt.xlabel("$n$")
@@ -102,5 +102,5 @@ def task_b_cont():
 
 if __name__ == "__main__":
     plt.style.use("ggplot")
-    #task_a()
-    task_b_cont()
+    task_a()
+    #task_b_cont()
